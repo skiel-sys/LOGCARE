@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import http from 'http';
 import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
@@ -360,9 +361,18 @@ app.post('/api/generate-care-log', async (req, res) => {
 
 // Vite middleware in dev or static files in prod
 async function startServer() {
+  // Create an explicit HTTP server so Vite's HMR WebSocket can share the same
+  // port as Express. In middlewareMode Vite otherwise spins up its own WS server
+  // on a different port, which the preview proxy can't reach -> "WebSocket
+  // connection failed" errors in the browser.
+  const server = http.createServer(app);
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: process.env.DISABLE_HMR === 'true' ? false : { server },
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -374,7 +384,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`CARELOG VA Server running on http://0.0.0.0:${PORT}`);
   });
 }
