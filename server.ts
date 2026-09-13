@@ -361,17 +361,16 @@ app.post('/api/generate-care-log', async (req, res) => {
 
 // Vite middleware in dev or static files in prod
 async function startServer() {
-  // Create an explicit HTTP server so Vite's HMR WebSocket can share the same
-  // port as Express. In middlewareMode Vite otherwise spins up its own WS server
-  // on a different port, which the preview proxy can't reach -> "WebSocket
-  // connection failed" errors in the browser.
   const server = http.createServer(app);
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        hmr: process.env.DISABLE_HMR === 'true' ? false : { server },
+        // HMR is fully disabled so the client never opens a WebSocket. This
+        // removes the "WebSocket closed without opened / connection failed"
+        // errors in the preview. Code changes require a manual page refresh.
+        hmr: false,
       },
       appType: 'spa',
     });
