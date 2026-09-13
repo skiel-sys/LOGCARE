@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CARELOG VA — Professional Care Documentation Assistant</title>
+    <meta name="description" content="Specialized professional care documentation assistant and care log generator adhering to strict clinical standards." />
+    <meta property="og:title" content="CARELOG VA — Professional Care Documentation Assistant" />
+    <meta property="og:description" content="Specialized professional care documentation assistant and care log generator adhering to strict clinical standards." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <!-- App Header -->
+    <header class="app-header" id="appHeader">
+      <div class="header-container">
+        <div class="brand-section">
+          <div class="brand-logo-icon" id="brandLogoIcon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="M12 8v8"/>
+              <path d="M8 12h8"/>
+            </svg>
+          </div>
+          <div class="brand-titles">
+            <div class="brand-title-row">
+              <h1 class="brand-name">CARELOG VA</h1>
+              <span class="brand-badge">Clinical Documentation</span>
+            </div>
+            <span class="brand-subtitle">Specialized Professional Care Documentation Assistant</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" class="api-status-btn" id="toggleSettingsBtn" title="Configure Google Gemini API Key">
+            <span class="status-dot missing" id="apiStatusDot"></span>
+            <span id="apiStatusText">Set API Key</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-wrapper" id="mainContainer">
+      <!-- API Key Settings Panel (Collapsible) -->
+      <section class="api-panel" id="apiPanel" aria-labelledby="apiPanelTitle">
+        <div class="api-panel-header">
+          <div class="api-panel-title" id="apiPanelTitle">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Google Gemini API Configuration</span>
+          </div>
+          <span style="font-size: 0.78rem; color: #0d735f; font-weight: 600;" id="apiModeBadge">Direct &amp; Server Proxy Supported</span>
+        </div>
+
+        <div class="api-grid">
+          <div class="api-input-wrap">
+            <input
+              type="password"
+              id="apiKeyInput"
+              placeholder="Paste your Gemini API key here (AIzaSy...)"
+              autocomplete="off"
+            />
+            <button type="button" class="api-eye-btn" id="toggleKeyVisibilityBtn" title="Toggle key visibility">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+
+          <div>
+            <select id="modelSelect" class="form-select" title="Select Gemini Model">
+              <option value="gemini-3.6-flash" selected>gemini-3.6-flash (Recommended Free Tier - High Speed)</option>
+              <option value="gemini-3.8-flash">gemini-3.8-flash (Standard Carelog Generation)</option>
+              <option value="gemini-2.5-flash">gemini-2.5-flash (Next-Gen Flash)</option>
+              <option value="gemini-flash-latest">gemini-flash-latest (Auto-Updating)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" id="testApiKeyBtn" title="Verify your API key connection">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span>Test Key</span>
+            </button>
+            <button type="button" class="btn btn-primary btn-sm" id="saveApiKeyBtn">
+              Save Key
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" id="clearApiKeyBtn" title="Remove key from browser">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Diagnostic Feedback Box -->
+        <div class="api-test-result" id="apiTestResult"></div>
+
+        <div class="api-note">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <span>Free Tier Support: Extra spaces, quotes, or <code>GEMINI_API_KEY=</code> prefixes are automatically cleaned. If one model is busy, the engine automatically switches to a responsive fallback. Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#0d735f; text-decoration:underline;">Google AI Studio</a>.</span>
+        </div>
+      </section>
+
+      <!-- Accessible Mobile View Switcher (Visible on mobile/tablet <= 900px) -->
+      <nav class="mobile-tab-switcher" id="mobileTabSwitcher" role="tablist" aria-label="Mobile workspace view selection">
+        <button type="button" class="mobile-tab-btn active" id="tabShowFormBtn" role="tab" aria-selected="true" aria-controls="formCard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>1. Shift Form</span>
+        </button>
+        <button type="button" class="mobile-tab-btn" id="tabShowOutputBtn" role="tab" aria-selected="false" aria-controls="outputCard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span>2. Care Logs</span>
+          <span class="mobile-tab-badge" id="mobileTabBadge">Ready</span>
+        </button>
+      </nav>
+
+      <!-- 2-Column Responsive Workspace Grid -->
+      <div class="workspace-grid" id="workspaceGrid">
+        <!-- Column 1: Caregiver Input Form -->
+        <section class="card form-card" id="formCard">
+          <div class="card-header" style="flex-direction: column; align-items: stretch; gap: 0.75rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+              <h2 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <span>Session &amp; Client Details</span>
+              </h2>
+
+              <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Medicaid Compliant</span>
+            </div>
+
+            <!-- Statutory Dignity, Privacy & Humane Care Reminder Banner -->
+            <div class="dignity-reminder-banner" id="dignityReminderBanner">
+              <div class="dignity-banner-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <path d="m9 12 2 2 4-4"></path>
+                </svg>
+              </div>
+              <div class="dignity-banner-content">
+                <div class="dignity-banner-header-row">
+                  <span class="dignity-badge">Statutory Standard</span>
+                  <span class="dignity-tag">Rights, Privacy &amp; Dignity</span>
+                </div>
+                <blockquote class="dignity-banner-quote">
+                  “Persons with developmental disabilities shall have a right to dignity, privacy, and humane care, including the right to be free from abuse, including sexual abuse, neglect, and exploitation”
+                </blockquote>
+                <p class="dignity-banner-note">
+                  All generated documentation strictly upholds person-centered language, bodily autonomy, and respectful, humane care standards.
+                </p>
+              </div>
+            </div>
+
+            <!-- Client Memory Management Bar -->
+            <div class="client-memory-bar" id="clientMemoryBar">
+              <div class="client-memory-info">
+                <span style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Active Client:</span>
+                <span class="client-memory-badge" id="clientMemoryBadge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  <span id="activeClientNameDisplay">No Client Selected</span>
+                </span>
+              </div>
+
+              <div class="client-memory-actions">
+                <button type="button" class="btn-xs btn-primary-xs" id="changeClientBtn" title="Switch client or add new client profile">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                  </svg>
+                  <span>Clients / Memory</span>
+                </button>
+                <button type="button" class="btn-xs" id="saveClientMemoryBtn" title="Save this client's name, routine, background, and schedule into memory">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                  <span>Save Client Memory</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- 1. Client Name -->
+            <div class="form-group">
+              <label for="clientNameInput" class="form-label">
+                <span>Client Name <span class="label-required">*</span></span>
+                <span class="label-tag">Saved to Memory</span>
+              </label>
+              <input
+                type="text"
+                id="clientNameInput"
+                class="form-input"
+                placeholder="Enter client's full name (e.g. Maria Gonzalez or John Doe)"
+                value=""
+                required
+              />
+            </div>
+
+            <!-- 2. Service Type / Type of Logs to Generate -->
+            <div class="form-group">
+              <label class="form-label">
+                <span>Type of Logs to Generate <span class="label-required">*</span></span>
+                <span class="label-tag">Word Count Enforced</span>
+              </label>
+              <div class="service-cards-grid">
+                <label class="service-card" id="serviceCompanionLabel">
+                  <input type="radio" name="serviceType" value="Companion" />
+                  <div class="service-card-content">
+                    <div class="service-card-name">
+                      <span>Companion Care</span>
+                      <span class="service-min-tag">Min 300 words</span>
+                    </div>
+                    <span class="service-card-desc">Social engagement, daily companionship, cognitive tasks, emotional wellbeing</span>
+                  </div>
+                </label>
+
+                <label class="service-card" id="serviceSlcLabel">
+                  <input type="radio" name="serviceType" value="Supported Living Coaching" />
+                  <div class="service-card-content">
+                    <div class="service-card-name">
+                      <span>Supported Living Coaching (SLC)</span>
+                      <span class="service-min-tag">Min 300 words</span>
+                    </div>
+                    <span class="service-card-desc">Targeted skill coaching, budgeting, household management, independent decisions</span>
+                  </div>
+                </label>
+
+                <label class="service-card selected" id="servicePsLabel">
+                  <input type="radio" name="serviceType" value="Personal Support" checked />
+                  <div class="service-card-content">
+                    <div class="service-card-name">
+                      <span>Personal Support</span>
+                      <span class="service-min-tag">Min 400 words</span>
+                    </div>
+                    <span class="service-card-desc">Hands-on care, hygiene, transfers, mobility pacing, meals, medication reminders</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- 3. SERVICE LOGS SCHEDULE / SHIFT TIME COVERAGE (Mandatory Time Alignment) -->
+            <div class="form-group" id="serviceScheduleSection">
+              <label for="shiftScheduleInput" class="form-label">
+                <span>Service Logs Schedule (Shift Time Coverage) <span class="label-required">*</span></span>
+                <span class="label-tag" style="color:var(--primary); font-weight:700;">Strict Time Alignment</span>
+              </label>
+
+              <!-- Quick Shift Preset Buttons -->
+              <div class="schedule-presets-grid" id="schedulePresetsGrid">
+                <button type="button" class="shift-preset-btn active" data-schedule="8:00 AM – 12:00 PM (4 Hours - Morning)">
+                  🌅 Morning (8:00 AM – 12:00 PM)
+                </button>
+                <button type="button" class="shift-preset-btn" data-schedule="1:00 PM – 5:00 PM (4 Hours - Afternoon)">
+                  ☀️ Afternoon (1:00 PM – 5:00 PM)
+                </button>
+                <button type="button" class="shift-preset-btn" data-schedule="4:00 PM – 8:00 PM (4 Hours - Evening)">
+                  🌆 Evening (4:00 PM – 8:00 PM)
+                </button>
+                <button type="button" class="shift-preset-btn" data-schedule="6:00 PM – 10:00 PM (4 Hours - Night / Bedtime)">
+                  🌙 Night (6:00 PM – 10:00 PM)
+                </button>
+                <button type="button" class="shift-preset-btn" data-schedule="8:00 AM – 4:00 PM (8 Hours - Full Day)">
+                  📅 Full Day (8:00 AM – 4:00 PM)
+                </button>
+              </div>
+
+              <div class="schedule-input-row">
+                <input
+                  type="text"
+                  id="shiftScheduleInput"
+                  class="form-input"
+                  placeholder="e.g. 8:00 AM – 12:00 PM (4 Hours - Morning)"
+                  value="8:00 AM – 12:00 PM (4 Hours - Morning)"
+                  required
+                />
+              </div>
+
+              <!-- Time Coverage Alignment Guarantee Box -->
+              <div class="shift-guide-box" id="shiftGuideBox">
+                <strong>🕒 Time Coverage Rule:</strong> The care log will be strictly appropriate to this schedule. 
+                <span id="shiftTimeRuleDesc">Morning shifts focus on wakefulness, morning hygiene, breakfast, and morning walking. Evening activities (such as dinner or tucking into bed) will never be placed on a morning shift.</span>
+              </div>
+            </div>
+
+            <!-- 4. Log Dates Selection (Enhanced Batch Chooser) -->
+            <div class="form-group">
+              <label class="form-label">
+                <span>Log Dates to Create <span class="label-required">*</span></span>
+                <span class="date-count-tag" id="dateCountTag">1 Date Selected</span>
+              </label>
+
+              <div class="date-picker-row-enhanced">
+                <input type="date" id="datePickerInput" class="form-input" style="max-width: 175px;" />
+                <button type="button" class="btn btn-secondary btn-sm" id="addDateBtn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  <span>Add Date</span>
+                </button>
+              </div>
+
+              <!-- Date Chips list -->
+              <div class="date-chips-wrap" id="dateChipsContainer"></div>
+
+              <!-- Quick Batch Selection Shortcuts -->
+              <div class="batch-dates-row">
+                <span class="batch-dates-label">Quick choose dates:</span>
+                <button type="button" class="btn-chip" id="quickTodayBtn">+ Today</button>
+                <button type="button" class="btn-chip" id="quickYesterdayBtn">+ Yesterday</button>
+                <button type="button" class="btn-chip" id="quickPast3DaysBtn">+ Past 3 Days</button>
+                <button type="button" class="btn-chip" id="quickThisWeekBtn">+ Mon – Fri (This Week)</button>
+                <button type="button" class="btn-chip" id="quickPast7DaysBtn">+ Past 7 Days</button>
+                <button type="button" class="btn-chip" id="clearDatesBtn" style="color:var(--danger); border-color:var(--danger-border); margin-left:auto;">Clear Dates</button>
+              </div>
+            </div>
+
+            <!-- 5. Client Background (Saved in Memory) -->
+            <div class="form-group">
+              <label for="clientBackgroundInput" class="form-label">
+                <span>Client Background</span>
+                <span class="label-tag">Saved with Client</span>
+              </label>
+              <textarea
+                id="clientBackgroundInput"
+                class="form-textarea"
+                rows="2"
+                placeholder="e.g. 68 y/o male with mild hemiparesis, uses rolling walker with standby guard, prefers gentle pacing..."
+              ></textarea>
+              <div class="form-hint">General client health context, mobility aids, communication style. (Saved in client memory).</div>
+            </div>
+
+            <!-- 5. Client Routine (Optional) -->
+            <div class="form-group">
+              <label for="clientRoutineInput" class="form-label">
+                <span>Client Routine</span>
+                <span class="label-tag">Optional</span>
+              </label>
+              <textarea
+                id="clientRoutineInput"
+                class="form-textarea"
+                rows="2"
+                placeholder="e.g. Typical morning hygiene, seated breakfast, hallway mobility walk, afternoon reading, evening settling..."
+              ></textarea>
+              <div class="form-hint">Recurring daily habits. Routine provides context but will not replace real session facts.</div>
+            </div>
+
+            <!-- 6. Real Session Notes (Required - Primary Factual Source) -->
+            <div class="form-group">
+              <label for="sessionNotesInput" class="form-label">
+                <span>Real Session Notes (Brief Notes &amp; Shorthand Welcome) <span class="label-required">*</span></span>
+                <span class="label-tag" style="color: #0d735f; font-weight:700;">Primary Source</span>
+              </label>
+
+              <!-- Reassuring Brief Notes Notice -->
+              <div class="brief-notes-banner" id="briefNotesBanner">
+                <div class="brief-notes-banner-header">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                  </svg>
+                  <span>Brief Notes &amp; Quick Shorthand Supported</span>
+                  <span class="brief-badge">Short Notes Expected</span>
+                </div>
+                <p class="brief-notes-banner-desc">
+                  <strong>Only have short notes from your shift? That is completely normal!</strong> You do not need full paragraphs or detailed sentences. Just enter your rough bullet points or fragments (e.g. <em>"shower, walker, assisted with lunch, rested, bed"</em>). CARELOG VA is specially programmed to expand your brief notes into a full 300+ or 400+ word professional clinical narrative without inventing fake facts.
+                </p>
+              </div>
+
+              <!-- Quick Insert Activity Chips -->
+              <div class="quick-inserts-wrap">
+                <div class="quick-inserts-header">
+                  <span class="quick-inserts-label">Quick-Tap to Add Care &amp; Community Activities:</span>
+                  <span class="quick-inserts-hint">Tap any button to append directly to shift notes</span>
+                </div>
+
+                <!-- 1. ADL & Care Activities -->
+                <div class="quick-category-block">
+                  <div class="quick-category-title">
+                    <span class="quick-cat-dot dot-care"></span>
+                    <span>Personal Care &amp; Daily Assistance</span>
+                  </div>
+                  <div class="quick-inserts-grid">
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Meal preparation: Assisted client with nutritious meal preparation and setup">+ Meal preparation</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Assistance provided for daily care needs and personal comfort">+ Assistance</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Hygiene reminders and verbal prompts provided for self-care">+ Hygiene reminders</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Physical assistance provided with transfers and steady movement">+ Physical assistance</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Grooming support provided including hair combing and skin care">+ Grooming</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Dressing assistance provided with clothing selection and fasteners">+ Dressing assistance</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Medication reminders prompted on schedule per routine">+ Medication reminders</button>
+                  </div>
+                </div>
+
+                <!-- 2. Household & Chores -->
+                <div class="quick-category-block">
+                  <div class="quick-category-title">
+                    <span class="quick-cat-dot dot-household"></span>
+                    <span>Household &amp; Chores</span>
+                  </div>
+                  <div class="quick-inserts-grid">
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Household chore assistance provided in living area">+ Household chore assistance</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Cleaning / organizing living space and keeping pathways clear">+ Cleaning / organizing</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Laundry: Assisted with sorting, washing, and folding clothes">+ Laundry</button>
+                  </div>
+                </div>
+
+                <!-- 3. Community Outings & Activities -->
+                <div class="quick-category-block">
+                  <div class="quick-category-title">
+                    <span class="quick-cat-dot dot-community"></span>
+                    <span>Activities &amp; Community</span>
+                  </div>
+                  <div class="quick-inserts-grid">
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Community outing: Mall visit with continuous companion support">+ Mall</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Community outing: Restaurant visit and dining assistance">+ Restaurant</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Indoor activity at home: Puzzles, cognitive engagement, and relaxation">+ Indoor activity at home</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Outdoor walk for fresh air and gentle physical ambulation">+ Outdoor walk</button>
+                  </div>
+                </div>
+
+                <!-- 4. Safety & Emotional Support -->
+                <div class="quick-category-block">
+                  <div class="quick-category-title">
+                    <span class="quick-cat-dot dot-safety"></span>
+                    <span>Safety &amp; Emotional Support</span>
+                  </div>
+                  <div class="quick-inserts-grid">
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Safety reminders given for posture, footwear, and environment">+ Safety reminders</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Pedestrian safety coaching practiced at crosswalks and walkways">+ Pedestrian safety</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Stranger awareness and social boundary reminders reinforced">+ Stranger awareness</button>
+                    <button type="button" class="btn-chip quick-insert-btn" data-insert="- Emotional support, active listening, and positive reassurance provided">+ Emotional support</button>
+                  </div>
+                </div>
+              </div>
+
+              <textarea
+                id="sessionNotesInput"
+                class="form-textarea notes-textarea"
+                rows="6"
+                placeholder="Enter your brief notes or quick fragments here — short notes are expected!
+Example:
+- Calm morning, assisted with warm shower and dressing
+- Rolling walker standby guard
+- Prepared breakfast, reminded morning meds
+- Rested in afternoon, hallway walking
+- Dinner support, evening dental hygiene and bed"
+                required
+              ></textarea>
+              <div class="form-hint">Brief notes from your shift. The system understands your notations and develops a complete narrative without inventing fake facts.</div>
+            </div>
+
+            <!-- 7. Specific Instructions (Optional) -->
+            <div class="form-group">
+              <label for="specificInstructionsInput" class="form-label">
+                <span>Specific Instructions</span>
+                <span class="label-tag">Optional</span>
+              </label>
+              <textarea
+                id="specificInstructionsInput"
+                class="form-textarea"
+                rows="2"
+                placeholder="e.g. Highlight laundry coaching on August 3rd; client felt fatigued in the afternoon on August 4th..."
+              ></textarea>
+            </div>
+
+            <!-- 8. Sample Logs / Style Reference (Optional Accordion) -->
+            <div class="form-group">
+              <div class="collapsible-header" id="toggleStyleAccordion">
+                <div style="display:flex; align-items:center; gap:0.45rem;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                  </svg>
+                  <span>Sample Logs (Style Reference)</span>
+                </div>
+                <span style="font-size:0.75rem; color:#64748b;">Click to expand</span>
+              </div>
+              <div class="collapsible-body" id="styleAccordionBody">
+                <textarea
+                  id="sampleLogsInput"
+                  class="form-textarea"
+                  rows="3"
+                  placeholder="Paste a previously approved agency care log to guide vocabulary, phrasing, and style matching..."
+                ></textarea>
+              </div>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="form-actions">
+              <button type="button" class="btn btn-primary" id="generateLogsBtn" style="flex: 1;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+                </svg>
+                <span>Generate Professional Care Log(s)</span>
+              </button>
+              <button type="button" class="btn btn-secondary" id="resetFormBtn" title="Clear form">
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Column 2: Output Display & Verification Area -->
+        <section class="card output-card" id="outputCard">
+          <div class="card-header">
+            <div class="card-header-left">
+              <button type="button" class="btn-back-to-form mobile-only" id="backToFormBtn" aria-label="Return to shift details form">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="19" y1="12" x2="5" y2="12"></line>
+                  <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                <span>Edit Shift Form</span>
+              </button>
+              <h2 class="card-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="9 11 12 14 22 4"></polyline>
+                  <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                <span>Generated Care Documentation</span>
+              </h2>
+            </div>
+
+            <div class="output-header-stats" id="outputHeaderStats">
+              <span class="stat-pill" id="outputClientName">Ready</span>
+              <span class="stat-pill" id="outputServiceType">Personal Support</span>
+              <span class="stat-pill" id="outputScheduleCoverage" style="display:none;">Shift Coverage</span>
+              <span class="stat-pill" id="outputDateCount">0 Dates</span>
+              <span class="stat-pill success" id="outputTotalWords">0 Words</span>
+            </div>
+          </div>
+
+          <div class="card-body" style="display:flex; flex-direction:column; flex:1;">
+            <!-- Empty Placeholder State -->
+            <div class="empty-output-state" id="emptyOutputState">
+              <div class="empty-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+              </div>
+              <h3 class="empty-title">Ready to Generate Clinical Care Logs</h3>
+              <p class="empty-desc">
+                Select your client or enter your session notes on the form, then tap <strong>Generate</strong> to produce continuous clinical narratives aligned to your shift coverage.
+              </p>
+
+              <!-- Rules Overview Box -->
+              <div class="rules-preview-box">
+                <div class="rules-preview-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>Embedded Clinical Quality Rules</span>
+                </div>
+                <ul class="rules-preview-list">
+                  <li>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Continuous narrative:</strong> Single cohesive block of text per date with no internal line breaks.</span>
+                  </li>
+                  <li>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Strict word counts:</strong> Companion (300+), SLC (300+), Personal Support (400+).</span>
+                  </li>
+                  <li>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Zero Clichés:</strong> No "I arrived", "Upon arrival", or "Before I left". Begins directly with client.</span>
+                  </li>
+                  <li>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span><strong>Factual Integrity:</strong> No invented foods, medications, or places. Notes remain primary source.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Loading Spinner State -->
+            <div class="loading-output-state" id="loadingOutputState">
+              <div class="spinner"></div>
+              <h3 class="loading-title">Generating Care Documentation</h3>
+              <div class="loading-step-msg" id="loadingStepMsg">Connecting to Gemini API...</div>
+              <p class="loading-subtext">
+                CARELOG VA is developing detailed narrative flow and verifying anti-repetition rules. This takes a few moments.
+              </p>
+            </div>
+
+            <!-- Results Output State -->
+            <div class="results-output-state" id="resultsOutputState">
+              <!-- Action Toolbar -->
+              <div class="results-action-bar">
+                <div style="font-size: 0.88rem; font-weight: 700; color: #064e3b; display:flex; align-items:center; gap:0.4rem;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                  <span>Verification Complete</span>
+                </div>
+                <div class="results-action-group">
+                  <button type="button" class="btn btn-outline-primary btn-sm" id="copyAllLogsBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                    <span>Copy All Logs</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="downloadTxtBtn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Download as .txt</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="clearOutputBtn" title="Clear current logs">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Clear</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Rendered Date Log Cards -->
+              <div id="generatedLogsContainer" style="display:flex; flex-direction:column; gap:1.25rem;"></div>
+
+              <!-- Mandatory Draft Review Disclaimer -->
+              <div class="disclaimer-banner" id="disclaimerBanner">
+                <div class="disclaimer-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+                <div class="disclaimer-text">
+                  <span class="disclaimer-strong">PROFESSIONAL COMPLIANCE NOTICE:</span>
+                  All generated documentation entries are preliminary drafts. While CARELOG VA strictly enforces clinical structure, Medicaid formatting standards, and anti-repetition rules, caregivers and agency supervisors must thoroughly review and approve all logs for factual accuracy prior to official billing or state submission.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Client Memory Management Modal -->
+    <div class="modal-overlay hidden" id="clientMemoryModal" role="dialog" aria-modal="true" aria-labelledby="clientModalTitle">
+      <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3 class="modal-title" id="clientModalTitle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Client Profiles &amp; Memory</span>
+          </h3>
+          <button type="button" class="modal-close-btn" id="closeClientModalBtn" aria-label="Close modal">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Direct In-Modal Add New Client Form -->
+          <div class="add-client-card" id="addClientCard">
+            <div class="add-client-card-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>+ Add New Client</span>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.65rem;">
+              <label class="form-label" for="newModalClientName">
+                <span>Client Full Name <span class="label-required">*</span></span>
+              </label>
+              <input
+                type="text"
+                id="newModalClientName"
+                class="form-input"
+                placeholder="e.g. Maria Gonzalez or Robert Chen"
+                required
+              />
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; margin-bottom: 0.65rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="newModalClientService">Service Type</label>
+                <select id="newModalClientService" class="form-input" style="padding-top: 0.45rem; padding-bottom: 0.45rem;">
+                  <option value="Personal Support" selected>Personal Support (Min 400 words)</option>
+                  <option value="Companion">Companion Care (Min 300 words)</option>
+                  <option value="Supported Living Coaching">Supported Living Coaching (Min 300 words)</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="newModalClientSchedule">Shift Schedule</label>
+                <input
+                  type="text"
+                  id="newModalClientSchedule"
+                  class="form-input"
+                  placeholder="e.g. 8:00 AM – 12:00 PM (Morning)"
+                  value="8:00 AM – 12:00 PM (4 Hours - Morning)"
+                />
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.65rem;">
+              <label class="form-label" for="newModalClientBackground">
+                <span>Background / Diagnoses / Mobility</span>
+                <span class="label-tag">Optional</span>
+              </label>
+              <textarea
+                id="newModalClientBackground"
+                class="form-textarea"
+                rows="2"
+                placeholder="e.g. 68-year-old gentleman, rolling walker for stability, mild hemiparesis, calm disposition, enjoys morning tea..."
+              ></textarea>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0.75rem;">
+              <label class="form-label" for="newModalClientRoutine">
+                <span>Recurring Daily Routine</span>
+                <span class="label-tag">Optional</span>
+              </label>
+              <textarea
+                id="newModalClientRoutine"
+                class="form-textarea"
+                rows="2"
+                placeholder="e.g. Morning warm shower, guided dressing assistance, seated breakfast, light hallway walk, routine medication reminder..."
+              ></textarea>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-sm" id="saveNewClientModalBtn" style="width: 100%;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              <span>Save &amp; Select This Client</span>
+            </button>
+          </div>
+
+          <!-- Saved Clients Roster -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.55rem;">
+              <span style="font-weight: 700; font-size: 0.86rem; color: var(--text-primary);">Saved Client Profiles</span>
+              <span style="font-size: 0.73rem; color: var(--text-muted);" id="savedClientsCountLabel">0 Saved</span>
+            </div>
+            <div class="client-list-grid" id="savedClientsList">
+              <!-- Dynamically rendered -->
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <span style="font-size:0.75rem; color:var(--text-muted);">Saved securely in your local browser memory</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="cancelClientModalBtn">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky Mobile Action Bar (Visible only on mobile devices) -->
+    <aside class="mobile-sticky-bar" id="mobileStickyBar" aria-label="Mobile quick actions">
+      <div class="mobile-sticky-inner">
+        <button type="button" class="mobile-sticky-client-pill" id="mobileStickyClientBtn" title="Change active client" aria-label="Active client selector">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span class="mobile-sticky-client-text" id="mobileStickyClientText">No Client</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <button type="button" class="btn btn-primary mobile-sticky-generate-btn" id="mobileStickyGenerateBtn" aria-label="Generate care documentation now">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          <span id="mobileStickyBtnText">Generate Logs</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+    <!-- Application Script -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

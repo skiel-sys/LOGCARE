@@ -1,0 +1,8 @@
+{
+  "name": "CARELOG VA",
+  "description": "Specialized professional care documentation assistant and care log generator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
